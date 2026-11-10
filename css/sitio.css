@@ -265,3 +265,15 @@ dialog.pers .btn{width:100%;justify-content:center;min-height:48px}
   /* en celular el recuadro de la camiseta cabe dentro de su escenario (antes medía 500 px en 430 y se montaba sobre las pestañas) */
   .j3d{width:min(340px,84vw);height:340px;top:45%;margin-left:calc(min(340px,84vw)/-2);margin-top:-170px}
 }
+
+/* Botón para volver arriba: aparece al bajar más allá de la portada */
+.subir{position:fixed;right:24px;bottom:calc(24px + env(safe-area-inset-bottom));z-index:40;width:52px;height:52px;border-radius:50%;
+  display:grid;place-items:center;background:var(--accent);color:var(--on-accent);
+  box-shadow:0 8px 24px #0008,0 0 0 1px #ffffff14;
+  opacity:0;transform:translateY(14px) scale(.9);pointer-events:none;transition:opacity .25s,transform .25s,background .2s}
+.subir.ver{opacity:1;transform:none;pointer-events:auto}
+.subir:hover{background:#ff8a45}
+.subir:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.subir svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:560px){.subir{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:48px;height:48px}}
+@media (prefers-reduced-motion:reduce){.subir{transition:none}}

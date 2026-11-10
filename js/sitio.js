@@ -55,11 +55,15 @@ function render(t){
 requestAnimationFrame(render);
 
 const stage=document.getElementById('stage');
+// Si una animación de la camiseta se corta a medio cambio de línea (por ejemplo, al tocarla),
+// se aplica igual el diseño de la línea nueva. Antes, cortar el cambio dejaba las pestañas bloqueadas.
+let pendiente=null;
+function cortarS(){ if(pendiente){ skin(pendiente); pendiente=null; } anime.remove(S); }
 let drag=false,lx=0,ly=0,vel=0;
 stage.addEventListener('pointerdown',e=>{
   if(e.target.closest('.stage-ui'))return;
-  drag=true;lx=e.clientX;ly=e.clientY;vel=0;stage.setPointerCapture(e.pointerId);
-  anime.remove(S);anime({targets:S,idle:0,duration:250,easing:'easeOutQuad'});
+  drag=true;lx=e.clientX;ly=e.clientY;vel=0;try{stage.setPointerCapture(e.pointerId)}catch(_){/* el toque ya terminó */}
+  cortarS();anime({targets:S,idle:0,scale:1,y:0,duration:250,easing:'easeOutQuad'});
 });
 stage.addEventListener('pointermove',e=>{
   if(!drag)return;
@@ -68,23 +72,23 @@ stage.addEventListener('pointermove',e=>{
 });
 const endDrag=()=>{
   if(!drag)return;drag=false;
-  anime.remove(S);
-  anime({targets:S,ry:S.ry+vel*14,rx:6,idle:[0,0],duration:1600,easing:'easeOutQuart',
+  cortarS();
+  anime({targets:S,ry:S.ry+vel*14,rx:6,scale:1,y:0,idle:[0,0],duration:1600,easing:'easeOutQuart',
     complete:()=>anime({targets:S,idle:1,duration:1400,easing:'easeInOutSine'})});
 };
 stage.addEventListener('pointerup',endDrag);stage.addEventListener('pointercancel',endDrag);
 
 function faceTo(deg){
   const target=Math.round((S.ry-deg)/360)*360+deg;
-  anime.remove(S);
-  anime({targets:S,ry:target,rx:4,idle:0.25,duration:1300,easing:'spring(1, 70, 11, 0)'});
+  cortarS();
+  anime({targets:S,ry:target,rx:4,scale:1,y:0,idle:0.25,duration:1300,easing:'spring(1, 70, 11, 0)'});
 }
 const chips=[...document.querySelectorAll('.chip')];
 const chipOn=b=>{chips.forEach(c=>c.classList.toggle('on',c===b))};
 document.getElementById('bFront').onclick=e=>{chipOn(e.currentTarget);faceTo(0)};
 document.getElementById('bBack').onclick=e=>{chipOn(e.currentTarget);faceTo(180)};
-document.getElementById('bSpin').onclick=e=>{chipOn(e.currentTarget);anime.remove(S);
-  anime({targets:S,ry:Math.round(S.ry/360)*360+360,rx:6,idle:0,duration:1800,easing:'easeInOutCubic',
+document.getElementById('bSpin').onclick=e=>{chipOn(e.currentTarget);cortarS();
+  anime({targets:S,ry:Math.round(S.ry/360)*360+360,rx:6,scale:1,y:0,idle:0,duration:1800,easing:'easeInOutCubic',
     complete:()=>anime({targets:S,idle:1,duration:1000,easing:'easeInOutSine'})})};
 
 const inName=document.getElementById('inName'), inNum=document.getElementById('inNum');
@@ -94,7 +98,7 @@ inNum.addEventListener('input',()=>{setBack();if(Math.abs(((S.ry%360)+360)%360-1
 setBack();
 
 /* ---------- LINE SWITCH ---------- */
-let current='amateur', busy=false;
+let current='amateur';
 const tabs=[...document.querySelectorAll('.tab')], pill=document.querySelector('.tab-pill');
 function movePill(btn,instant){
   const r=btn.getBoundingClientRect(), p=btn.parentElement.getBoundingClientRect();
@@ -114,16 +118,16 @@ function setInfo(k){
     sp.textContent=L.spec;anime({targets:sp,opacity:[0,1],translateY:[8,0],duration:400,easing:'easeOutQuad'})}});
 }
 function switchLine(k){
-  if(k===current||busy)return; busy=true; current=k;
+  if(k===current)return; current=k;
   tabs.forEach(t=>t.classList.toggle('on',t.dataset.k===k));
   movePill(tabs.find(t=>t.dataset.k===k));
   setInfo(k);
-  anime.remove(S);
+  cortarS(); pendiente=k;
   const base=Math.round(S.ry/360)*360;
   anime.timeline({easing:'easeInQuad'})
-    .add({targets:S,ry:base+90,scale:.82,y:-20,idle:0,rx:0,duration:380,complete:()=>skin(k)})
+    .add({targets:S,ry:base+90,scale:.82,y:-20,idle:0,rx:0,duration:380,complete:()=>{if(pendiente){skin(pendiente);pendiente=null}}})
     .add({targets:S,ry:base+360,scale:1,y:0,rx:6,duration:1100,easing:'spring(1, 75, 12, 0)'})
-    .add({targets:S,idle:1,duration:900,easing:'easeInOutSine',complete:()=>{busy=false}},'-=500');
+    .add({targets:S,idle:1,duration:900,easing:'easeInOutSine'},'-=500');
   chipOn(document.getElementById('bFront'));
 }
 tabs.forEach(t=>t.onclick=()=>switchLine(t.dataset.k));
@@ -244,4 +248,20 @@ if(!reduce){
     stage.scrollIntoView({block:'center',behavior:reduce?'auto':'smooth'});
     chipOn(document.getElementById('bBack')); faceTo(180);
   };
+})();
+
+/* ---------- VOLVER ARRIBA ---------- */
+(function(){
+  const b=document.getElementById('subir');
+  let visible=false;
+  function revisar(){
+    const ver=scrollY>innerHeight*0.8;
+    if(ver===visible)return;
+    visible=ver; b.classList.toggle('ver',ver); b.tabIndex=ver?0:-1;
+  }
+  addEventListener('scroll',revisar,{passive:true}); revisar();
+  b.addEventListener('click',()=>{
+    window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});
+    b.blur();
+  });
 })();
