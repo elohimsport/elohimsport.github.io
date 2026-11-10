@@ -253,3 +253,11 @@ dialog.pers .btn{width:100%;justify-content:center;min-height:48px}
   .levels .fabric{min-height:0;aspect-ratio:4/3;background:linear-gradient(transparent 65%,var(--bg)),url(../img/sitio/tela-niveles.webp) center 40%/cover}
   .levels-txt{padding:12px 16px 64px}
 }
+
+/* La camiseta 3D no debe tapar los controles: pestañas de línea y botones Frente/Espalda/Girar siempre encima */
+.tabs{z-index:3}
+.stage-ui{z-index:3}
+@media (max-width:900px){
+  /* en celular el recuadro de la camiseta cabe dentro de su escenario (antes medía 500 px en 430 y se montaba sobre las pestañas) */
+  .j3d{width:min(340px,84vw);height:340px;top:45%;margin-left:calc(min(340px,84vw)/-2);margin-top:-170px}
+}
