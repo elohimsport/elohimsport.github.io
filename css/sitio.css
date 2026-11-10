@@ -243,14 +243,18 @@ dialog.pers .btn{width:100%;justify-content:center;min-height:48px}
 
 /* NIVELES DE RENDIMIENTO, como la página 2 del catálogo: la tela a un lado, el texto al otro */
 .levels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;padding:0;min-height:min(86vh,760px)}
-.levels .fabric{position:relative;inset:auto;align-self:stretch;min-height:520px;opacity:1;transform:none;
-  background:linear-gradient(90deg,transparent 70%,var(--bg)),url(../img/sitio/tela-niveles.webp) center/cover}
+.levels .fabric{position:relative;align-self:stretch;min-height:520px;overflow:hidden}
+.levels .fabric img{position:absolute;top:0;left:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center}
+.levels .fabric::after{content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,transparent 70%,var(--bg))}
 .levels-txt{padding:80px clamp(24px,6vw,96px) 80px clamp(24px,4vw,64px);max-width:680px}
 .levels-tit{font-family:var(--display);font-style:normal;font-weight:400;font-size:clamp(40px,4.4vw,60px);line-height:1;letter-spacing:.01em;color:var(--accent)}
 .levels .levels-intro{margin:18px 0 0;max-width:56ch;font-size:clamp(16px,1.35vw,19px);line-height:1.6;color:var(--ink)}
 @media (max-width:900px){
   .levels{grid-template-columns:1fr;min-height:0}
-  .levels .fabric{min-height:0;aspect-ratio:4/3;background:linear-gradient(transparent 65%,var(--bg)),url(../img/sitio/tela-niveles.webp) center 40%/cover}
+  /* alto fijo en vw: el aspect-ratio en un elemento sin contenido daba alto 0 en algunos Safari de iPhone */
+  .levels .fabric{min-height:0;height:75vw;max-height:520px}
+  .levels .fabric img{object-position:center 40%}
+  .levels .fabric::after{background:linear-gradient(transparent 65%,var(--bg))}
   .levels-txt{padding:12px 16px 64px}
 }
 
