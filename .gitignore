@@ -1,0 +1,23 @@
+# Solo se publica lo que usa index.html (GitHub Pages, repo público).
+# Todo lo demás (fotos RAW, herramientas, versión vieja, notas internas) queda fuera.
+/*
+!/.gitignore
+!/.nojekyll
+!/index.html
+
+!/css/
+/css/*
+!/css/sitio.css
+
+!/js/
+/js/*
+!/js/sitio.js
+!/js/camisetas-3d.js
+!/js/anime-3.2.2.min.js
+
+!/img/
+/img/*
+!/img/logo-elohim.svg
+!/img/amateur-modelo.webp
+!/img/profesional-modelo.webp
+!/img/sitio/
